@@ -193,7 +193,10 @@ class Janela(QMainWindow):
             self.enviar_dados.resize(0, 0)
 
     def LI_Clicado(self):
-        print('Investimentos listados!')
+        if self.lista_investimentos.height() == 0: 
+            self.lista_investimentos.resize(int((self.largura / 100 * 98)), int((self.altura / 100 * 78)))
+        else:
+            self.lista_investimentos.resize(0, 0)
 
     def MI_Clicado(self):
         print('Investimento modificado!')
