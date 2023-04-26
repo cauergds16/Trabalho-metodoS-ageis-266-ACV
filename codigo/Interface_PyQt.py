@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from invesmentimento import Investimento
+from investimento import Investimento
 
 class Janela(QMainWindow):
     def __init__(self):
@@ -21,6 +21,7 @@ class Janela(QMainWindow):
         self.criar_investimento.move(self.largura - 170, 10)
         self.criar_investimento.resize(170, 40)
         self.criar_investimento.setStyleSheet('QPushButton {background-color: #20C12B}')
+        self.criar_investimento.clicked.connect(self.CI_Clicado)
 
         self.listar_investimento = QPushButton('Listar Investimentos' , self)
         self.listar_investimento.move(self.largura - 340, 10)
@@ -36,6 +37,7 @@ class Janela(QMainWindow):
         self.deletar_investimento.move(self.largura - 680, 10)
         self.deletar_investimento.resize(170, 40)
         self.deletar_investimento.setStyleSheet('QPushButton {background-color: #17ADCB}')
+        self.deletar_investimento.clicked.connect(self.DI_Clicado)
 
         self.salvar_investimentos = QPushButton('Salvar Investimentos', self)
         self.salvar_investimentos.move(self.largura - 850, 10)
@@ -51,10 +53,8 @@ class Janela(QMainWindow):
         self.enviar_dados.resize(0, 0)
         self.enviar_dados.setStyleSheet('QPushButton {background-color: #CB177F}')
 
-        self.criar_investimento.clicked.connect(self.CI_Clicado)
         self.listar_investimento.clicked.connect(self.LI_Clicado)
         self.modificar_investimento.clicked.connect(self.MI_Clicado)
-        self.deletar_investimento.clicked.connect(self.DI_Clicado)
         self.salvar_investimentos.clicked.connect(self.SI_Clicado)
         self.detalhar_ativo.clicked.connect(self.DA_Clicado)
         self.enviar_dados.clicked.connect(self.Criar_Clicado)
@@ -105,7 +105,8 @@ class Janela(QMainWindow):
         print('Investimento modificado!')
 
     def DI_Clicado(self):
-        print('Investimento deletado!')
+        item_selecionado = self.lista_investimentos.currentRow()
+        self.lista_investimentos.takeItem(item_selecionado)
 
     def SI_Clicado(self):
         print('Investimentos salvos!')
@@ -126,11 +127,11 @@ class Janela(QMainWindow):
         elif int(quantidade) <= 0:
             self.Mensagem_de_Erro('quantidade')
         elif float(valor_unidade) <= 0:
-            self.Mensagem_de_Erro('quantidade')
+            self.Mensagem_de_Erro('valor da unidade')
         elif float(taxa_de_corretagem) <= 0:
             self.Mensagem_de_Erro('taxa de corretagem')
         else:
-            investimento_atual = Investimento(data, codigo, quantidade, valor_unidade, tipo, taxa_de_corretagem)
+            investimento_atual = Investimento(data, codigo, int(quantidade), float(valor_unidade), tipo, float(taxa_de_corretagem))
             self.lista_investimentos.addItem(investimento_atual.__str__())
 
 
