@@ -1,7 +1,9 @@
+import datetime
+
 class Investimento:
-    def __init__(self, data, codigo, quantidade, valor_unidade, tipo, taxa_corretagem):
-        self.__data = data
+    def __init__(self, codigo, data, quantidade, valor_unidade, tipo, taxa_corretagem):
         self.__codigo = codigo
+        self.__data = data
         self.__quantidade = quantidade
         self.__valor_unidade = valor_unidade
         self.__tipo = tipo
@@ -14,7 +16,7 @@ class Investimento:
         self.valor_final()
 
     def __str__(self):
-        return f'Código: {self.__codigo} | Data: {self.__data} | Quantidade: {self.__quantidade} | Valor da Unidade: {self.__valor_unidade} | Tipo: {self.__tipo} | Taxa de Corretagem: {self.__taxa_corretagem} | Valor da Operação: {self.__valor_operacao} | Imposto: {self.__imposto} | Valor Final: {self.__valor_final}'
+        return f' {self.__codigo:6} | {self.__data.strftime("%d/%m/%Y")} | {self.__quantidade:10} | {round(self.__valor_unidade, 2):16} | {self.__tipo:6} | {self.__taxa_corretagem:20} | {round(self.__valor_operacao, 2):17} | {round(self.__valor_final, 2):11} |'
 
     @property
     def data(self):
