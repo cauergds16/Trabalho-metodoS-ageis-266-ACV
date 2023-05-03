@@ -21,20 +21,26 @@ def legenda_investimento():
 def linhas_horizontais():
     return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+'
 
-def listar_investimentos(lista):
+def listar_investimentos(lista, ativo):
     print(legenda_investimento())
-    for n in range(len(lista)):
-        print(linhas_horizontais())
-        print(f' {n + 1}| {lista[n]}')
+    if ativo == None:
+        for n in range(len(lista)):
+            print(linhas_horizontais())
+            print(f' {n + 1}| {lista[n]}')
+    else:
+        for l in range(len(lista)):
+            if lista[l].tercodigo == str(ativo):
+                print(linhas_horizontais())
+                print(f' {l + 1}| {lista[l]}')
 
-def listar_investimentos_com_banco(lista):
+def listar_investimentos_com_banco(lista, ativo = None):
     cur.execute(f"SELECT * FROM investimento")
     lista_nao_convertida = cur.fetchall()
     for n in range(len(lista_nao_convertida)):
         objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
         lista.append(objeto)
     lista.sort(key = lambda x: x.data)
-    listar_investimentos(lista)
+    listar_investimentos(lista, ativo)
     del lista[:]
     del lista_nao_convertida[:]
     conn.commit()
@@ -118,7 +124,8 @@ def main():
         elif escolha == 4:
             deletar_investimento()
         elif escolha == 5:
-            pass
+            ativo = digitos('codigo')
+            listar_investimentos_com_banco(lista, ativo)
 
 def digitos(info):
 
@@ -199,4 +206,5 @@ def digitos(info):
                 print('\nEscolha inválida. Tente novamente!')
 
 if __name__ == '__main__':
+    main()
     main()

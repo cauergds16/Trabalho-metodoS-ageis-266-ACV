@@ -23,7 +23,7 @@ class Investimento:
         return self.__data
     
     @property
-    def codigo(self):
+    def tercodigo(self):
         return self.__codigo
 
     @property
@@ -61,4 +61,7 @@ class Investimento:
         self.__imposto = 0.0003
     
     def valor_final(self):
-        self.__valor_final = self.__valor_operacao + (self.__valor_operacao * self.__imposto) + self.__taxa_corretagem
+        if self.__tipo == 'COMPRA':
+            self.__valor_final = self.__valor_operacao + (self.__valor_operacao * self.__imposto) + self.__taxa_corretagem
+        else:
+            self.__valor_final = self.__valor_operacao - (self.__valor_operacao * self.__imposto) - self.__taxa_corretagem
