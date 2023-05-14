@@ -13,7 +13,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 def menu():
-    return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo.'
+    return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo. [0]_ Finalizar.'
 
 def legenda_investimento(ativo):
     if ativo == None:
@@ -151,6 +151,9 @@ def main():
         elif escolha == 5:
             ativo = digitos('codigo')
             listar_investimentos_com_banco(lista, ativo)
+        elif escolha == 0:
+            conn.close()
+            break
 
 def digitos(info):
 
@@ -224,12 +227,11 @@ def digitos(info):
         while True:
             try:
                 escolha = int(input('\nDigite sua escolha: '))
-                if escolha < 1 or escolha > 6:
+                if escolha < 0 or escolha > 6:
                     raise Exception
                 return escolha
             except:
                 print('\nEscolha inválida. Tente novamente!')
 
 if __name__ == '__main__':
-    main()
     main()
