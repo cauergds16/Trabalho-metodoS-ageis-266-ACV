@@ -35,29 +35,29 @@ def listar_investimentos(lista, ativo):
             print(f' {n + 1}| {lista[n]}')
     else:
         print(legenda_investimento(ativo))
-        quantidade = 0
         preco_medio = 0
-        valor_total_anterior = 0
-        vendas = 0
+        quantidade_total = 0
+        venda = 0
         for l in range(len(lista)):
             if lista[l].tercodigo == str(ativo):
                 if lista[l].tipo == 'COMPRA' and l == 0:
-                    quantidade = lista[l].quantidade
-                    valor_total_anterior = lista[l].valor_final_a
-                    preco_medio = lista[l].valor_final_a / quantidade
+                    preco_medio = lista[l].valor_final_a / lista[l].quantidade
+                    quantidade_total += lista[l].quantidade
                 elif lista[l].tipo == 'COMPRA':
-                    quantidade += lista[l].quantidade
-                    preco_medio = (lista[l].valor_final_a + valor_total_anterior) / quantidade
+                    quantidade_total += lista[l].quantidade
+                    preco_medio = (lista[l].valor_final_a + quantidade_total * preco_medio) / lista[l].quantidade
                 elif lista[l].tipo == 'VENDA':
-                    quantidade -= lista[l].quantidade
-                    
-
+                    venda = lista[l].valor_final_a - lista[l].quantidade * preco_medio
+                    quantidade_total -= lista[l].quantidade
                 print(linhas_horizontais(ativo))
                 if lista[l].tipo == 'VENDA':
                     print(f' {l + 1}| {lista[l]}        ---- |')
                 else:
-                    print(f' {l + 1}| {lista[l]}        {preco_medio:.2f} |')
-
+                    print(f' {l + 1}| {lista[l]} {preco_medio:11.2f} |')
+        if venda < 0:
+            print(f'\nPrejuízo de {abs(venda):.2f}.')
+        else:
+            print(f'Lucro de {venda:.2f}.')
 def listar_investimentos_com_banco(lista, ativo = None):
     cur.execute(f"SELECT * FROM investimento")
     lista_nao_convertida = cur.fetchall()
