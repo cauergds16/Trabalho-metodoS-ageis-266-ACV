@@ -3,11 +3,11 @@ import psycopg2
 from decimal import Decimal
 
 conn = psycopg2.connect(
-    host="containers-us-west-209.railway.app",
-    port = 7199,
+    host="containers-us-west-26.railway.app",
+    port = "7944",
     database="railway",
     user="postgres",
-    password="68N7rlanoyebMviVGHmi"
+    password="OS5murwmpdYzCWhNGZc8"
 )
 
 cur = conn.cursor()
@@ -15,23 +15,48 @@ cur = conn.cursor()
 def menu():
     return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo.'
 
-def legenda_investimento():
-    return '____________________________________________________________________________________________________________________________\nID| CÓDIGO  |    DATA    | QUANTIDADE | VALOR DA UNIDADE |  TIPO  |  TAXA DE CORRETAGEM  | VALOR DA OPERAÇÃO | VALOR TOTAL |'
+def legenda_investimento(ativo):
+    if ativo == None:
+        return '____________________________________________________________________________________________________________________________\nID| CÓDIGO  |    DATA    | QUANTIDADE | VALOR DA UNIDADE |  TIPO  |  TAXA DE CORRETAGEM  | VALOR DA OPERAÇÃO | VALOR TOTAL |'
+    else:
+        return '_________________________________________________________________________________________________________________________________________\nID| CÓDIGO  |    DATA    | QUANTIDADE | VALOR DA UNIDADE |  TIPO  |  TAXA DE CORRETAGEM  | VALOR DA OPERAÇÃO | VALOR TOTAL | PREÇO MÉDIO |'
 
-def linhas_horizontais():
-    return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+'
+def linhas_horizontais(ativo):
+    if ativo == None:
+        return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+'
+    else:
+        return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+-------------+'
 
 def listar_investimentos(lista, ativo):
-    print(legenda_investimento())
     if ativo == None:
+        print(legenda_investimento(None))
         for n in range(len(lista)):
-            print(linhas_horizontais())
+            print(linhas_horizontais(None))
             print(f' {n + 1}| {lista[n]}')
     else:
+        print(legenda_investimento(ativo))
+        quantidade = 0
+        preco_medio = 0
+        valor_total_anterior = 0
+        vendas = 0
         for l in range(len(lista)):
             if lista[l].tercodigo == str(ativo):
-                print(linhas_horizontais())
-                print(f' {l + 1}| {lista[l]}')
+                if lista[l].tipo == 'COMPRA' and l == 0:
+                    quantidade = lista[l].quantidade
+                    valor_total_anterior = lista[l].valor_final_a
+                    preco_medio = lista[l].valor_final_a / quantidade
+                elif lista[l].tipo == 'COMPRA':
+                    quantidade += lista[l].quantidade
+                    preco_medio = (lista[l].valor_final_a + valor_total_anterior) / quantidade
+                elif lista[l].tipo == 'VENDA':
+                    quantidade -= lista[l].quantidade
+                    
+
+                print(linhas_horizontais(ativo))
+                if lista[l].tipo == 'VENDA':
+                    print(f' {l + 1}| {lista[l]}        ---- |')
+                else:
+                    print(f' {l + 1}| {lista[l]}        {preco_medio:.2f} |')
 
 def listar_investimentos_com_banco(lista, ativo = None):
     cur.execute(f"SELECT * FROM investimento")
