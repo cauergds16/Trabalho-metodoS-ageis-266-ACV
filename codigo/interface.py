@@ -45,7 +45,7 @@ def listar_investimentos(lista, ativo):
                     quantidade_total += lista[l].quantidade
                 elif lista[l].tipo == 'COMPRA':
                     quantidade_total += lista[l].quantidade
-                    preco_medio = (lista[l].valor_final_a + quantidade_total * preco_medio) / lista[l].quantidade
+                    preco_medio = (lista[l].valor_final_a + lista[l].quantidade * preco_medio) / quantidade_total
                 elif lista[l].tipo == 'VENDA':
                     venda = lista[l].valor_final_a - lista[l].quantidade * preco_medio
                     quantidade_total -= lista[l].quantidade
