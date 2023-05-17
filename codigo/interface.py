@@ -163,6 +163,7 @@ def main():
             ativo = digitos('codigo')
             listar_investimentos_com_banco(lista, ativo)
         elif escolha == 0:
+            cur.close()
             conn.close()
             break
 
