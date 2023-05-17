@@ -84,7 +84,7 @@ def criar_investimento():
 
     conn.commit()
 
-def modificar_investimento():
+def modificar_investimento(lista):
     codigo = digitos('codigo')
     data = digitos('data')
     cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{codigo}' and data = '{data}'")
@@ -114,16 +114,27 @@ def modificar_investimento():
         nov_taxa_de_corretagem = digitos('taxa_de_corretagem')
         cur.execute(f"UPDATE investimento SET cod_investimento = '{nov_taxa_de_corretagem}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
 
-def deletar_investimento():
-    codigo = digitos('codigo')
-    data = digitos('data')
-    cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    investimento = cur.fetchall()
-    objeto = Investimento(investimento[0][0], investimento[0][1], investimento[0][2], float(investimento[0][3]), investimento[0][4], float(investimento[0][5]))
-    print(legenda_investimento())
-    print(linhas_horizontais())
-    print(f'NA| {objeto}')
-    cur.execute(f"DELETE FROM investimento WHERE cod_investimento = '{codigo}' and data = '{data}'")
+def deletar_investimento(lista):
+    cur.execute(f"SELECT * FROM investimento")
+    lista_nao_convertida = cur.fetchall()
+    for n in range(len(lista_nao_convertida)):
+        objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
+        lista.append(objeto)
+    lista.sort(key = lambda x: x.data)
+    listar_investimentos(lista, None)
+    while True:
+        try:
+            escolha = int(input('\nDigite o ID do investimento que deseja deletar: '))
+            if escolha < 1 or escolha > (len(lista)):
+                raise Exception
+            else:
+                break
+        except:
+            print('\nID inválido. Tente novamente!')
+    cur.execute(f"DELETE FROM investimento WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}';")
+    del lista[:]
+    del lista_nao_convertida[:]
+    conn.commit()
 
 def opcoes_de_mudanca():
     return '\n[1]_ Código. [2]_ Data [3]_ Quantidade. [4]_ Valor Unidade. [5]_ Tipo. [6]_ Taxa de Corretagem.'
@@ -147,7 +158,7 @@ def main():
         elif escolha == 3:
             listar_investimentos_com_banco(lista)
         elif escolha == 4:
-            deletar_investimento()
+            deletar_investimento(lista)
         elif escolha == 5:
             ativo = digitos('codigo')
             listar_investimentos_com_banco(lista, ativo)
