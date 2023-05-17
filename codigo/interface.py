@@ -39,7 +39,7 @@ def listar_investimentos(lista, ativo):
         quantidade_total = 0
         venda = 0
         for l in range(len(lista)):
-            if lista[l].tercodigo == str(ativo):
+            if lista[l].codigo == str(ativo):
                 if lista[l].tipo == 'COMPRA' and l == 0:
                     preco_medio = lista[l].valor_final_a / lista[l].quantidade
                     quantidade_total += lista[l].quantidade

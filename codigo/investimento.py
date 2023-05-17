@@ -23,7 +23,7 @@ class Investimento:
         return self.__data
     
     @property
-    def tercodigo(self):
+    def codigo(self):
         return self.__codigo
 
     @property
@@ -31,27 +31,27 @@ class Investimento:
         return self.__quantidade
      
     @property 
-    def codigo(self):
+    def valor_unidade(self):
         return self.__valor_unidade
     
     @property
-    def codigo(self):
+    def tipo(self):
         return self.__tipo
     
     @property
-    def codigo(self):
+    def taxa_corretagem(self):
         return self.__taxa_corretagem
 
     @property
-    def codigo(self):
+    def valor_operacao_a(self):
         return self.__valor_operacao
     
     @property
-    def codigo(self):
+    def imposto_a(self):
         return self.__imposto
 
     @property
-    def codigo(self):
+    def valor_final_a(self):
         return self.__valor_final
 
     def valor_operacao(self):
