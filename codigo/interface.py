@@ -32,28 +32,31 @@ def listar_investimentos(lista, ativo):
         print(legenda_investimento(None))
         for n in range(len(lista)):
             print(linhas_horizontais(None))
-            print(f' {n + 1}| {lista[n]}')
+            print(f'{(n + 1):2.0f}| {lista[n]}')
     else:
         print(legenda_investimento(ativo))
         preco_medio = 0
         quantidade_total = 0
+        quantidade_passada = 0
         venda = 0
         for l in range(len(lista)):
             if lista[l].codigo == str(ativo):
                 if lista[l].tipo == 'COMPRA' and l == 0:
                     preco_medio = lista[l].valor_final_a / lista[l].quantidade
                     quantidade_total += lista[l].quantidade
+                    quantidade_passada += lista[l].quantidade
                 elif lista[l].tipo == 'COMPRA':
                     quantidade_total += lista[l].quantidade
-                    preco_medio = (lista[l].valor_final_a + lista[l].quantidade * preco_medio) / quantidade_total
+                    preco_medio = (lista[l].valor_final_a + (quantidade_passada * preco_medio)) / quantidade_total
+                    quantidade_passada += lista[l].quantidade
                 elif lista[l].tipo == 'VENDA':
-                    venda += lista[l].valor_final_a - lista[l].quantidade * preco_medio
+                    venda += (lista[l].valor_unidade - preco_medio) * lista[l].quantidade
                     quantidade_total -= lista[l].quantidade
                 print(linhas_horizontais(ativo))
                 if lista[l].tipo == 'VENDA':
-                    print(f' {l + 1}| {lista[l]}        ---- |')
+                    print(f'{(l + 1):2.0f}| {lista[l]}        ---- |')
                 else:
-                    print(f' {l + 1}| {lista[l]} {preco_medio:11.2f} |')
+                    print(f'{(l + 1):2.0f}| {lista[l]} {preco_medio:11.2f} |')
         if venda < 0:
             print(f'\nPrejuízo de {abs(venda):.2f}.')
         else:
@@ -77,8 +80,6 @@ def criar_investimento():
     valor_unidade = digitos ('valor_unidade')
     tipo = digitos('tipo')
     taxa_de_corretagem = digitos('taxa_de_corretagem')
-
-    # lista.append(Investimento(codigo, data, quantidade, valor_unidade, tipo, taxa_de_corretagem))
 
     cur.execute(f"INSERT INTO investimento (cod_investimento, data, quantidade, valor_unidade, tipo_investimento, taxa_de_corretagem) VALUES ('{codigo}', '{data}', {str(quantidade)}, {str(valor_unidade)}, '{tipo}', {str(taxa_de_corretagem)})")
 
