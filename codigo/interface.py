@@ -52,6 +52,7 @@ def listar_investimentos(lista, ativo):
                 elif lista[l].tipo == 'VENDA':
                     venda += (lista[l].valor_unidade - preco_medio) * lista[l].quantidade
                     quantidade_total -= lista[l].quantidade
+                    quantidade_passada -= lista[l].quantidade
                 print(linhas_horizontais(ativo))
                 if lista[l].tipo == 'VENDA':
                     print(f'{(l + 1):2.0f}| {lista[l]}        ---- |')
