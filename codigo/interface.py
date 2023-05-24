@@ -3,11 +3,11 @@ import psycopg2
 from decimal import Decimal
 
 conn = psycopg2.connect(
-    host="containers-us-west-26.railway.app",
-    port = "7944",
+    host="containers-us-west-143.railway.app",
+    port = "7528",
     database="railway",
     user="postgres",
-    password="OS5murwmpdYzCWhNGZc8"
+    password="5pI2W3vto01B6zH1qgxj"
 )
 
 cur = conn.cursor()
