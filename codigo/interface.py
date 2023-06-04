@@ -1,6 +1,6 @@
 from investimento import Investimento, datetime
+from funcoes import digitos, menu, legenda_investimento, linhas_horizontais, opcoes_de_mudanca
 import psycopg2
-from decimal import Decimal
 
 conn = psycopg2.connect(
     host="containers-us-west-143.railway.app",
@@ -12,29 +12,28 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-def menu():
-    return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo. [0]_ Finalizar.'
-
-def legenda_investimento(ativo):
+def listar_investimentos(ativo = None, uso = None):
     if ativo == None:
-        return '____________________________________________________________________________________________________________________________\nID| CÓDIGO  |    DATA    | QUANTIDADE | VALOR DA UNIDADE |  TIPO  |  TAXA DE CORRETAGEM  | VALOR DA OPERAÇÃO | VALOR TOTAL |'
-    else:
-        return '_________________________________________________________________________________________________________________________________________\nID| CÓDIGO  |    DATA    | QUANTIDADE | VALOR DA UNIDADE |  TIPO  |  TAXA DE CORRETAGEM  | VALOR DA OPERAÇÃO | VALOR TOTAL | PREÇO MÉDIO |'
-
-def linhas_horizontais(ativo):
-    if ativo == None:
-        return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+'
-    else:
-        return '--+---------+------------+------------+------------------+--------+----------------------+-------------------+-------------+-------------+'
-
-def listar_investimentos(lista, ativo):
-    if ativo == None:
+        lista = []
+        cur.execute("SELECT * FROM investimento ORDER BY data")
+        lista_nao_convertida = cur.fetchall()
+        for n in range(len(lista_nao_convertida)):
+            objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
+            lista.append(objeto)
         print(legenda_investimento(None))
         for n in range(len(lista)):
             print(linhas_horizontais(None))
             print(f'{(n + 1):2.0f}| {lista[n]}')
+        if uso == 'modificar':
+            return lista
     else:
-        print(legenda_investimento(ativo))
+        lista = []
+        cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{ativo}' ORDER BY data")
+        lista_nao_convertida = cur.fetchall()
+        for n in range(len(lista_nao_convertida)):
+            objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
+            lista.append(objeto)
+        print(legenda_investimento(1))
         preco_medio = 0
         quantidade_total = 0
         quantidade_passada = 0
@@ -61,18 +60,7 @@ def listar_investimentos(lista, ativo):
         if venda < 0:
             print(f'\nPrejuízo de {abs(venda):.2f}.')
         else:
-            print(f'Lucro de {venda:.2f}.')
-def listar_investimentos_com_banco(lista, ativo = None):
-    cur.execute(f"SELECT * FROM investimento")
-    lista_nao_convertida = cur.fetchall()
-    for n in range(len(lista_nao_convertida)):
-        objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
-        lista.append(objeto)
-    lista.sort(key = lambda x: x.data)
-    listar_investimentos(lista, ativo)
-    del lista[:]
-    del lista_nao_convertida[:]
-    conn.commit()
+            print(f'\nLucro de {venda:.2f}.')
 
 def criar_investimento():
     codigo = digitos('codigo')
@@ -86,69 +74,60 @@ def criar_investimento():
 
     conn.commit()
 
-def modificar_investimento(lista):
-    codigo = digitos('codigo')
-    data = digitos('data')
-    cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    investimento = cur.fetchall()
-    objeto = Investimento(investimento[0][0], investimento[0][1], investimento[0][2], float(investimento[0][3]), investimento[0][4], float(investimento[0][5]))
-    print(legenda_investimento())
-    print(linhas_horizontais())
-    print(f'NA| {objeto}')
-    print(opcoes_de_mudanca())
-    escolha = digitos('escolha')
-    if escolha == 1:
-        nov_codigo = digitos('codigo')
-        cur.execute(f"UPDATE investimento SET cod_investimento = '{nov_codigo}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    elif escolha == 2:
-        nov_data = digitos('data')
-        cur.execute(f"UPDATE investimento SET data = '{nov_data}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    elif escolha == 3:
-        nov_quantidade = digitos('quantidade')
-        cur.execute(f"UPDATE investimento SET quantidade = '{nov_quantidade}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    elif escolha == 4:
-        nov_valor_unidade = digitos('valor_unidade')
-        cur.execute(f"UPDATE investimento SET valor_unidade = '{nov_valor_unidade}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    elif escolha == 5:
-        nov_tipo = digitos('tipo')
-        cur.execute(f"UPDATE investimento SET tipo_investimento = '{nov_tipo}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
-    elif escolha == 6:
-        nov_taxa_de_corretagem = digitos('taxa_de_corretagem')
-        cur.execute(f"UPDATE investimento SET cod_investimento = '{nov_taxa_de_corretagem}' WHERE cod_investimento = '{codigo}' and data = '{data}'")
+def modificar_deletar_investimento(uso):
+    lista = []
+    lista = listar_investimentos(None, 'modificar')
+    if uso == 'modificar':
+        while True:
+            try:
+                escolha = int(input('\nDigite o ID do investimento que deseja modificar: '))
+                if escolha < 1 or escolha > (len(lista)):
+                    raise Exception
+                else:
+                    break
+            except:
+                print('\nID inválido. Tente novamente!')
+    elif uso == 'deletar':
+        while True:
+            try:
+                escolha = int(input('\nDigite o ID do investimento que deseja deletar: '))
+                if escolha < 1 or escolha > (len(lista)):
+                    raise Exception
+                else:
+                    break
+            except:
+                print('\nID inválido. Tente novamente!')
+    print(legenda_investimento(None))
+    print(linhas_horizontais(None))
+    print(f'NA| {lista[escolha - 1]}')
+    if uso == 'modificar':
+        print(opcoes_de_mudanca())
+        escolha = digitos('escolha')
+        if escolha == 1:
+            nov_codigo = digitos('codigo')
+            cur.execute(f"UPDATE investimento SET cod_investimento = '{nov_codigo}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+        elif escolha == 2:
+            nov_data = digitos('data')
+            cur.execute(f"UPDATE investimento SET data = '{nov_data}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+        elif escolha == 3:
+            nov_quantidade = digitos('quantidade')
+            cur.execute(f"UPDATE investimento SET quantidade = '{nov_quantidade}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+        elif escolha == 4:
+            nov_valor_unidade = digitos('valor_unidade')
+            cur.execute(f"UPDATE investimento SET valor_unidade = '{nov_valor_unidade}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+        elif escolha == 5:
+            nov_tipo = digitos('tipo')
+            cur.execute(f"UPDATE investimento SET tipo_investimento = '{nov_tipo}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+        elif escolha == 6:
+            nov_taxa_de_corretagem = digitos('taxa_de_corretagem')
+            cur.execute(f"UPDATE investimento SET cod_investimento = '{nov_taxa_de_corretagem}' WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
+    else:
+        cur.execute(f"DELETE FROM investimento WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}'")
 
-def deletar_investimento(lista):
-    cur.execute(f"SELECT * FROM investimento")
-    lista_nao_convertida = cur.fetchall()
-    for n in range(len(lista_nao_convertida)):
-        objeto = Investimento(lista_nao_convertida[n][0], lista_nao_convertida[n][1], lista_nao_convertida[n][2], float(lista_nao_convertida[n][3]), lista_nao_convertida[n][4], float(lista_nao_convertida[n][5]))
-        lista.append(objeto)
-    lista.sort(key = lambda x: x.data)
-    listar_investimentos(lista, None)
-    while True:
-        try:
-            escolha = int(input('\nDigite o ID do investimento que deseja deletar: '))
-            if escolha < 1 or escolha > (len(lista)):
-                raise Exception
-            else:
-                break
-        except:
-            print('\nID inválido. Tente novamente!')
-    cur.execute(f"DELETE FROM investimento WHERE cod_investimento = '{lista[escolha - 1].codigo}' and data = '{lista[escolha - 1].data}' and quantidade = '{lista[escolha - 1].quantidade}' and valor_unidade = '{lista[escolha - 1].valor_unidade}' and tipo_investimento = '{lista[escolha - 1].tipo}' and taxa_de_corretagem = '{lista[escolha - 1].taxa_corretagem}';")
-    del lista[:]
-    del lista_nao_convertida[:]
     conn.commit()
 
-def opcoes_de_mudanca():
-    return '\n[1]_ Código. [2]_ Data [3]_ Quantidade. [4]_ Valor Unidade. [5]_ Tipo. [6]_ Taxa de Corretagem.'
-
 def main():
-
-    lista = []
-
-
     while True:
-        lista.sort(key = lambda x: x.data)
-
         print(menu())
         
         escolha = digitos('escolha')
@@ -156,96 +135,18 @@ def main():
         if escolha == 1:
             criar_investimento()
         elif escolha == 2:
-            modificar_investimento()
+            modificar_deletar_investimento('modificar')
         elif escolha == 3:
-            listar_investimentos_com_banco(lista)
+            listar_investimentos()
         elif escolha == 4:
-            deletar_investimento(lista)
+            modificar_deletar_investimento('deletar')
         elif escolha == 5:
             ativo = digitos('codigo')
-            listar_investimentos_com_banco(lista, ativo)
+            listar_investimentos(ativo)
         elif escolha == 0:
             cur.close()
             conn.close()
             break
-
-def digitos(info):
-
-    # SISTEMA DE ENTRADA PARA O CÓDIGO DO INVESTIMENTO:
-    if info == 'codigo':
-        while True:
-            try:
-                codigo = input('\nDigite o código do investimento: ').upper()
-                if not codigo[:3].isalpha() or not codigo[4:].isnumeric() and len(codigo) < 5 or len(codigo) > 5:
-                    raise Exception
-                return codigo
-            except:
-                print('\nCódigo inválido. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA A DATA DO INVESTIMENTO:
-    elif info == 'data':
-        while True:
-            try:
-                data = input('\nDigite a data do investimento: ')
-                data_convertida = datetime.datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
-                return data_convertida
-            except:
-                print('\nData inválida. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA A QUANTIDADE DO INVESTIMENTO:
-    elif info == 'quantidade':
-        while True:
-            try:
-                quantidade = int(input('\nDigite a quantidade do investimento: '))
-                if quantidade < 1:
-                    raise Exception
-                return quantidade
-            except:
-                print('\nQuantidade inválida. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA O VALOR DA UNIDADE DO INVESTIMENTO:
-    elif info == 'valor_unidade':
-        while True:
-            try:
-                valor_unidade = float(input('\nDigite o valor da unidade do investimento: '))
-                if valor_unidade <= 0:
-                    raise Exception
-                return valor_unidade
-            except:
-                print('\nValor inválido. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA O TIPO DO INVESTIMENTO:
-    elif info == 'tipo':
-        while True:
-            try:
-                tipo = input('\nDigite o tipo do investimento: ').upper().strip()
-                if tipo != 'COMPRA' and tipo != 'VENDA':
-                    raise Exception
-                return tipo
-            except:
-                print('\nTipo inválido. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA A TAXA DE CORRETAGEM DO INVESTIMENTO:
-    elif info == 'taxa_de_corretagem':
-        while True:
-            try:
-                taxa_de_corretagem = float(input('\nDigite a taxa de corretagem do investimento: '))
-                if taxa_de_corretagem <= 0:
-                    raise Exception
-                return taxa_de_corretagem
-            except:
-                print('\nValor da taxa inválido. Tente novamente!')
-
-    # SISTEMA DE ENTRADA PARA A ESCOLHA DO MENU:
-    elif info == 'escolha':
-        while True:
-            try:
-                escolha = int(input('\nDigite sua escolha: '))
-                if escolha < 0 or escolha > 6:
-                    raise Exception
-                return escolha
-            except:
-                print('\nEscolha inválida. Tente novamente!')
 
 if __name__ == '__main__':
     main()
