@@ -1,4 +1,4 @@
-from investimento import Investimento, datetime
+from investimento import *
 from funcoes import digitos, menu, legenda_investimento, linhas_horizontais, opcoes_de_mudanca
 import psycopg2
 
