@@ -12,6 +12,52 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
+def lucro_total():
+    lista_das_listas = []
+    lucro_total = 0
+    cur.execute(f"SELECT DISTINCT cod_investimento FROM investimento")
+    codigos = cur.fetchall()
+    for n in range(len(codigos)):
+        objeto = []
+        lista_atual = None
+        cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{codigos[n][0]}'")
+        lista_atual = cur.fetchall()
+        for j in range(len(lista_atual)):
+            print(lista_atual[j])
+            objeto.append(Investimento(lista_atual[j][0], lista_atual[j][1], lista_atual[j][2], float(lista_atual[j][3]), lista_atual[j][4], float(lista_atual[j][5])))
+        lista_das_listas.append(objeto)
+    print(lista_das_listas[0][0])
+    print(lista_das_listas[0][1])
+    print(lista_das_listas[0][2])
+    print(lista_das_listas[0][3])
+    print(lista_das_listas[0][4])
+    print(lista_das_listas[1][0])
+    print(lista_das_listas[1][1])
+    print(lista_das_listas[1][2])
+    print(lista_das_listas[1][3])
+    print(lista_das_listas[1][4])
+    # for n in range(len(lista_das_listas)):
+    #     preco_medio = 0
+    #     quantidade_total = 0
+    #     quantidade_passada = 0
+    #     venda = 0
+    #     for l in range(len(lista_das_listas[n])):
+    #         if lista_das_listas[n][l].tipo == 'COMPRA' and l == 0:
+    #             preco_medio = lista_das_listas[n][l].valor_final_a / lista_das_listas[n][l].quantidade
+    #             quantidade_total += lista_das_listas[n][l].quantidade
+    #             quantidade_passada += lista_das_listas[n][l].quantidade
+    #         elif lista_das_listas[n][l].tipo == 'COMPRA':
+    #             quantidade_total += lista_das_listas[n][l].quantidade
+    #             preco_medio = (lista_das_listas[n][l].valor_final_a + (quantidade_passada * preco_medio)) / quantidade_total
+    #             quantidade_passada += lista_das_listas[n][l].quantidade
+    #         elif lista_das_listas[n][l].tipo == 'VENDA':
+    #             venda += (lista_das_listas[n][l].valor_unidade - preco_medio) * lista_das_listas[n][l].quantidade
+    #             quantidade_total -= lista_das_listas[n][l].quantidade
+    #             quantidade_passada -= lista_das_listas[n][l].quantidade
+    #         print(lista_das_listas[n][l])
+    #     lucro_total += venda
+    # print(lucro_total)
+    
 def listar_investimentos(ativo = None, uso = None):
     if ativo == None:
         lista = []
@@ -138,6 +184,7 @@ def main():
             modificar_deletar_investimento('modificar')
         elif escolha == 3:
             listar_investimentos()
+            lucro_total()
         elif escolha == 4:
             modificar_deletar_investimento('deletar')
         elif escolha == 5:
