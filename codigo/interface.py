@@ -23,40 +23,28 @@ def lucro_total():
         cur.execute(f"SELECT * FROM investimento WHERE cod_investimento = '{codigos[n][0]}'")
         lista_atual = cur.fetchall()
         for j in range(len(lista_atual)):
-            print(lista_atual[j])
             objeto.append(Investimento(lista_atual[j][0], lista_atual[j][1], lista_atual[j][2], float(lista_atual[j][3]), lista_atual[j][4], float(lista_atual[j][5])))
         lista_das_listas.append(objeto)
-    print(lista_das_listas[0][0])
-    print(lista_das_listas[0][1])
-    print(lista_das_listas[0][2])
-    print(lista_das_listas[0][3])
-    print(lista_das_listas[0][4])
-    print(lista_das_listas[1][0])
-    print(lista_das_listas[1][1])
-    print(lista_das_listas[1][2])
-    print(lista_das_listas[1][3])
-    print(lista_das_listas[1][4])
-    # for n in range(len(lista_das_listas)):
-    #     preco_medio = 0
-    #     quantidade_total = 0
-    #     quantidade_passada = 0
-    #     venda = 0
-    #     for l in range(len(lista_das_listas[n])):
-    #         if lista_das_listas[n][l].tipo == 'COMPRA' and l == 0:
-    #             preco_medio = lista_das_listas[n][l].valor_final_a / lista_das_listas[n][l].quantidade
-    #             quantidade_total += lista_das_listas[n][l].quantidade
-    #             quantidade_passada += lista_das_listas[n][l].quantidade
-    #         elif lista_das_listas[n][l].tipo == 'COMPRA':
-    #             quantidade_total += lista_das_listas[n][l].quantidade
-    #             preco_medio = (lista_das_listas[n][l].valor_final_a + (quantidade_passada * preco_medio)) / quantidade_total
-    #             quantidade_passada += lista_das_listas[n][l].quantidade
-    #         elif lista_das_listas[n][l].tipo == 'VENDA':
-    #             venda += (lista_das_listas[n][l].valor_unidade - preco_medio) * lista_das_listas[n][l].quantidade
-    #             quantidade_total -= lista_das_listas[n][l].quantidade
-    #             quantidade_passada -= lista_das_listas[n][l].quantidade
-    #         print(lista_das_listas[n][l])
-    #     lucro_total += venda
-    # print(lucro_total)
+    for n in range(len(lista_das_listas)):
+        preco_medio = 0
+        quantidade_total = 0
+        quantidade_passada = 0
+        venda = 0
+        for m in range(len(lista_das_listas[n])):
+            if lista_das_listas[n][m].tipo == 'COMPRA' and m == 0:
+                preco_medio = lista_das_listas[n][m].valor_final_a / lista_das_listas[n][m].quantidade
+                quantidade_total += lista_das_listas[n][m].quantidade
+                quantidade_passada += lista_das_listas[n][m].quantidade
+            elif lista_das_listas[n][m].tipo == 'COMPRA':
+                quantidade_total += lista_das_listas[n][m].quantidade
+                preco_medio = (lista_das_listas[n][m].valor_final_a + (quantidade_passada * preco_medio)) / quantidade_total
+                quantidade_passada += lista_das_listas[n][m].quantidade
+            elif lista_das_listas[n][m].tipo == 'VENDA':
+                venda += lista_das_listas[n][m].valor_final_a- preco_medio * lista_das_listas[n][m].quantidade
+                quantidade_total -= lista_das_listas[n][m].quantidade
+                quantidade_passada -= lista_das_listas[n][m].quantidade
+        lucro_total += venda
+    print(f'\nLucro total: {lucro_total:.2f}')
     
 def listar_investimentos(ativo = None, uso = None):
     if ativo == None:
@@ -95,7 +83,7 @@ def listar_investimentos(ativo = None, uso = None):
                     preco_medio = (lista[l].valor_final_a + (quantidade_passada * preco_medio)) / quantidade_total
                     quantidade_passada += lista[l].quantidade
                 elif lista[l].tipo == 'VENDA':
-                    venda += (lista[l].valor_unidade - preco_medio) * lista[l].quantidade
+                    venda += lista[l].valor_final_a - preco_medio * lista[l].quantidade
                     quantidade_total -= lista[l].quantidade
                     quantidade_passada -= lista[l].quantidade
                 print(linhas_horizontais(ativo))
