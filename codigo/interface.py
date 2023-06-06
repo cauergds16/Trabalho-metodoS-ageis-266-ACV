@@ -44,7 +44,10 @@ def lucro_total():
                 quantidade_total -= lista_das_listas[n][m].quantidade
                 quantidade_passada -= lista_das_listas[n][m].quantidade
         lucro_total += venda
-    print(f'\nLucro total: {lucro_total:.2f}')
+    if lucro_total >= 0:
+        print(f'\nLucro total: {lucro_total:.2f}')
+    else:
+        print(f'\nPrejuízo total: {lucro_total:.2f}')
     
 def listar_investimentos(ativo = None, uso = None):
     if ativo == None:
@@ -172,7 +175,6 @@ def main():
             modificar_deletar_investimento('modificar')
         elif escolha == 3:
             listar_investimentos()
-            lucro_total()
         elif escolha == 4:
             modificar_deletar_investimento('deletar')
         elif escolha == 5:
