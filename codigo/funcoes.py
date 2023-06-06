@@ -71,7 +71,7 @@ def digitos(info):
                 print('\nEscolha inválida. Tente novamente!')
 
 def menu():
-    return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo. [0]_ Finalizar.'
+    return '\n[1]_ Criar investimento. [2]_ Modificar investimento. [3]_ Listar investimentos. [4]_ Deletar investimento. [5]_ Detalhar ativo. [6]_Lucro/prejuízo da carteira. [0]_ Finalizar.'
 
 def legenda_investimento(ativo):
     if ativo == None:
