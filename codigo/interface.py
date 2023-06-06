@@ -178,6 +178,8 @@ def main():
         elif escolha == 5:
             ativo = digitos('codigo')
             listar_investimentos(ativo)
+        elif escolha == 6:
+            lucro_total()
         elif escolha == 0:
             cur.close()
             conn.close()
