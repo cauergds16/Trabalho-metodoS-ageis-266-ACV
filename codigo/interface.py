@@ -47,7 +47,7 @@ def lucro_total():
     if lucro_total >= 0:
         print(f'\nLucro total: {lucro_total:.2f}')
     else:
-        print(f'\nPrejuízo total: {lucro_total:.2f}')
+        print(f'\nPrejuízo total: {abs(lucro_total):.2f}')
     
 def listar_investimentos(ativo = None, uso = None):
     if ativo == None:
